@@ -1,14 +1,15 @@
 #pragma once
 
 #include "dfa.hpp"
+#include <string>
 
 namespace mini_c_lexer {
-    class DFAIdentifiers : public DFA {
+    class DFAGroupingOperators : public DFA {
         public:
-            DFAIdentifiers();
+            DFAGroupingOperators();         
             void do_transition(char& input) override;
-            void test() override;
             bool is_lexem() const override;
+            void test() override;
             std::string which_token_is() override;
     };
 };

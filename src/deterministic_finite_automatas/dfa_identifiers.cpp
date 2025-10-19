@@ -4,7 +4,6 @@
 #include <cctype>
 #include <iostream>
 
-
 mini_c_lexer::DFAIdentifiers::DFAIdentifiers() {
     /*
     DFA:
@@ -55,7 +54,8 @@ void mini_c_lexer::DFAIdentifiers::test() {
         for (char c : input) {
             do_transition(c);
         }
-        std::cout << input << " is lexem: " << std::boolalpha << is_lexem() << std::endl;
+        std::cout << input << " is lexem: " << std::boolalpha << is_lexem();
+        std::cout << "; TOKEN: " << which_token_is() << std::endl;
     }
     current_state = 0;
 };
@@ -63,4 +63,9 @@ void mini_c_lexer::DFAIdentifiers::test() {
 bool mini_c_lexer::DFAIdentifiers::is_lexem() const {
     if (current_state == -1) return false;
     return transitions_table[current_state][2] == 1;
+}
+
+std::string mini_c_lexer::DFAIdentifiers::which_token_is() {
+    if (is_lexem()) return "ID";
+    return "NONE";
 }

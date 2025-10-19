@@ -52,7 +52,8 @@ void mini_c_lexer::DFAIntegers::test() {
         for (char c : input) {
             do_transition(c);
         }
-        std::cout << input << " is lexem: " << std::boolalpha << is_lexem() << std::endl;
+        std::cout << input << " is lexem: " << std::boolalpha << is_lexem();
+        std::cout << "; TOKEN: " << which_token_is() << std::endl;
     }
     current_state = 0;
 };
@@ -60,4 +61,10 @@ void mini_c_lexer::DFAIntegers::test() {
 bool mini_c_lexer::DFAIntegers::is_lexem() const {
     if (current_state == -1) return false;
     return transitions_table[current_state][1] == 1;
+}
+
+
+std::string mini_c_lexer::DFAIntegers::which_token_is() {
+    if (is_lexem()) return "INT_NUM";
+    return "NONE";
 }

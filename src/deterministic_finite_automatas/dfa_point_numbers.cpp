@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <cctype>
+#include <stdexcept>
 
 mini_c_lexer::DFAPointNumbers::DFAPointNumbers() {
     /*
@@ -83,12 +84,7 @@ void mini_c_lexer::DFAPointNumbers::test() {
             do_transition(c);
         }
         std::cout << input << " is lexem: " << std::boolalpha << is_lexem();
-        try {
-            std::cout << "; TOKEN: " << which_token_is() << std::endl;
-        }
-        catch (std::logic_error) {
-            std::cout << "NONE" << std::endl;
-        }
+        std::cout << "; TOKEN: " << which_token_is() << std::endl;
     }
     current_state = 0;
 };
@@ -107,8 +103,7 @@ std::string mini_c_lexer::DFAPointNumbers::which_token_is() {
             return "LONG_DOUBLE_NUM";
             break;
         default:
-            throw std::logic_error("no token's been detected");
-            break;
+            return "NONE";
     }
 }
 

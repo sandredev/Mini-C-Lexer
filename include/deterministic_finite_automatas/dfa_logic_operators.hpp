@@ -10,6 +10,6 @@ namespace mini_c_lexer {
             void do_transition(char& input) override;
             bool is_lexem() const override;
             void test() override;
-            std::string which_token_is();
+            std::string which_token_is() override;
     };
 };

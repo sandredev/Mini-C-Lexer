@@ -1,7 +1,6 @@
 #include "../../include/deterministic_finite_automatas/dfa_logic_operators.hpp"
 #include <string>
 #include <vector>
-#include <cctype>
 #include <iostream>
 #include <stdexcept>
 
@@ -66,12 +65,7 @@ void mini_c_lexer::DFALogicOperators::test() {
             do_transition(c);
         }
         std::cout << input << " is lexem: " << std::boolalpha << is_lexem();
-        try {
-            std::cout << "; TOKEN: " << which_token_is() << std::endl;
-        }
-        catch (std::logic_error) {
-            std::cout << "NONE" << std::endl;
-        }
+        std::cout << "; TOKEN: " << which_token_is() << std::endl;
     }
     current_state = 0;
 };
@@ -94,7 +88,7 @@ std::string mini_c_lexer::DFALogicOperators::which_token_is() {
             return "NOT_OP";
             break;
         default:
-            throw std::logic_error("no token's been detected");
+            return "NONE";
             break;
     }
 }

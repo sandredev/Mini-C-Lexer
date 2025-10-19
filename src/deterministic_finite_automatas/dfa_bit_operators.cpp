@@ -1,9 +1,7 @@
 #include "../../include/deterministic_finite_automatas/dfa_bit_operators.hpp"
 #include <string>
 #include <vector>
-#include <cctype>
 #include <iostream>
-#include <stdexcept>
 
 
 mini_c_lexer::DFABitOperators::DFABitOperators() {
@@ -85,12 +83,7 @@ void mini_c_lexer::DFABitOperators::test() {
             do_transition(c);
         }
         std::cout << input << " is lexem: " << std::boolalpha << is_lexem();
-        try {
-            std::cout << "; TOKEN: " << which_token_is() << std::endl;
-        }
-        catch (std::logic_error) {
-            std::cout << "NONE" << std::endl;
-        }
+        std::cout << "; TOKEN: " << which_token_is() << std::endl;
     }
     current_state = 0;
 };
@@ -121,9 +114,8 @@ std::string mini_c_lexer::DFABitOperators::which_token_is() {
         case 8:
             return "BIT_NOT";
             break;
-    
         default:
-            throw std::logic_error("no token's been detected");
+            return "NONE";
             break;
     }
 }

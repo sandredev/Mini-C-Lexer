@@ -20,13 +20,13 @@ mini_c_lexer::DFAMathSymbols::DFAMathSymbols() {
     -1 means no transition.
     */
     transitions_table = {
-                         {1, 2, 3, 4, 5, 0}, // init
-                         {-1, -1, -1, -1, -1, 1}, // PLUS
-                         {-1, -1, -1, -1, -1, 1}, // MINUS
-                         {-1, -1, -1, -1, -1, 1}, // MUL_OP
-                         {-1, -1, -1, -1, -1, 1}, // DIV_OP
-                         {-1, -1, -1, -1, -1, 1} // MOD_OP
-                        };
+        {1, 2, 3, 4, 5, 0}, // init
+        {-1, -1, -1, -1, -1, 1}, // PLUS
+        {-1, -1, -1, -1, -1, 1}, // MINUS
+        {-1, -1, -1, -1, -1, 1}, // MUL_OP
+        {-1, -1, -1, -1, -1, 1}, // DIV_OP
+        {-1, -1, -1, -1, -1, 1} // MOD_OP
+    };
 };
 
 void mini_c_lexer::DFAMathSymbols::do_transition(char& input) {
@@ -75,12 +75,7 @@ void mini_c_lexer::DFAMathSymbols::test() {
             do_transition(c);
         }
         std::cout << input << " is lexem: " << std::boolalpha << is_lexem();
-        try {
-            std::cout << "; TOKEN: " << which_token_is() << std::endl;
-        }
-        catch (std::logic_error) {
-            std::cout << "NONE" << std::endl;
-        }
+        std::cout << "; TOKEN: " << which_token_is() << std::endl;
     }
     current_state = 0;
 };
@@ -104,7 +99,7 @@ std::string mini_c_lexer::DFAMathSymbols::which_token_is() {
         return "MOD_OP";
         break;
     default:
-        throw std::logic_error("no lexem's been detected");
+        return "NONE";
         break;
     }
 }

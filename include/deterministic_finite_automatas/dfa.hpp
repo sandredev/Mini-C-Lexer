@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 namespace mini_c_lexer {
     // Abstract class that represents a DFA
@@ -28,9 +29,14 @@ namespace mini_c_lexer {
             // Method used for testing DFAs
             virtual void test() = 0;
 
-            // I don't know why this is important yet
+            // In case of working with dynamic casting, this fully cleans the memory of the information
+            // stored by any DFA object created
             virtual ~DFA();
 
-            virtual void restartDFA();
+            // Restart the DFA to identify a new pattern
+            virtual void restart();
+
+            // Says which token the DFA has accepted (in case it accepts more than one)
+            virtual std::string which_token_is() = 0;
     };
 }
