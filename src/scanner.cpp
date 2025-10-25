@@ -15,13 +15,26 @@
 mini_c_lexer::Scanner::Scanner() : prefix("") {}; 
 
 void mini_c_lexer::Scanner::scan(std::string& input) {
+    last_detected_token = "NONE";
     std::cout << "Currently scanning code..." << std::endl << input << std::endl;
-    remove_comments(input); // ensures there's no comments in the input
-    input.push_back('\0'); // this character is appended to ensure the last token of the input is processed
+    remove_comments(input); // Ensures there's no comments in the input
+    input.push_back('\0'); // This character is appended to ensure the last token of the input is processed
     for (char c : input) {
+        // If a string or char literal is being scanned, the algorithm change in order
+        // to scan it properly
+        if (is_scanning_string_or_char_literal()) {
+            prefix += c;
+            dfa_string_literals.do_transition(c);
+            dfa_char_literals.do_transition(c);
+            last_detected_token = (dfa_char_literals.which_token_is() != "NONE") ? 
+                    dfa_char_literals.which_token_is() : last_detected_token;  
+            last_detected_token = (dfa_string_literals.which_token_is() != "NONE") ? 
+                    dfa_string_literals.which_token_is() : last_detected_token;  
+            continue;
+        }
         // If the current character is a character that separates tokens then outputs the
-        // last token detected before that character continues scanning
-        if (c == ' ' || c == '\n' || c == '\t' || c == '\0') {
+        // last token detected before that character and continues scanning
+        if (c == '\n' || c == '\t' || c == '\0' || c == ' ') {
             if (last_detected_token != "NONE") std::cout << "TOKEN: " << last_detected_token 
                                                 << " \"" << prefix << "\"" << std::endl;
             prefix = "";
@@ -30,15 +43,15 @@ void mini_c_lexer::Scanner::scan(std::string& input) {
             continue;
         }
         prefix += c;
-        update_last_detected_token_if_keyword();
         make_dfas_do_transition(c);
         update_last_detected_token_if_not_keyword();
+        update_last_detected_token_if_keyword();
 
         // If the current prefix with the last character added is not a lexem of any DFA anymore, 
         // outputs the last token detected and the prefix before it stopped beign a lexem. 
         // Then restarts the value of the prefix starting with the new character that made the last
         // prefix stop beign a lexem to scan a new token.
-        if (!is_current_prefix_a_lexem()) {
+        if (!is_current_prefix_a_lexem() && !is_scanning_string_or_char_literal() && !is_a_longer_prefix_possible()) {
             std::cout << "TOKEN: " << last_detected_token << " \"" << prefix.substr(0, prefix.length() - 1) << "\"" << std::endl;
             prefix = c;
             last_detected_token = "NONE";
@@ -187,24 +200,28 @@ bool mini_c_lexer::Scanner::update_last_detected_token_if_keyword() {
 };
 
 void mini_c_lexer::Scanner::update_last_detected_token_if_not_keyword() {
-    last_detected_token = (dfa_identifiers.which_token_is() != "NONE" && last_detected_token == "NONE") ? 
+    last_detected_token = (dfa_identifiers.which_token_is() != "NONE") ? 
                     dfa_identifiers.which_token_is() : last_detected_token;
-    last_detected_token = (dfa_integers.which_token_is() != "NONE" && last_detected_token == "NONE") ? 
-                    dfa_integers.which_token_is() : last_detected_token; 
-    last_detected_token = (dfa_point_numbers.which_token_is() != "NONE" && last_detected_token == "NONE") ? 
+    last_detected_token = (dfa_point_numbers.which_token_is() != "NONE") ? 
                     dfa_point_numbers.which_token_is() : last_detected_token;
-    last_detected_token = (dfa_string_literals.which_token_is() != "NONE" && last_detected_token == "NONE") ? 
+    last_detected_token = (dfa_integers.which_token_is() != "NONE") ? 
+                    dfa_integers.which_token_is() : last_detected_token; 
+    last_detected_token = (dfa_string_literals.which_token_is() != "NONE") ? 
                     dfa_string_literals.which_token_is() : last_detected_token;
-    last_detected_token = (dfa_grouping_operators.which_token_is() != "NONE" && last_detected_token == "NONE") ? 
+    last_detected_token = (dfa_grouping_operators.which_token_is() != "NONE") ? 
                     dfa_grouping_operators.which_token_is() : last_detected_token;
-    last_detected_token = (dfa_relational_operators.which_token_is() != "NONE" && last_detected_token == "NONE") ? 
-                    dfa_relational_operators.which_token_is() : last_detected_token;
-    last_detected_token = (dfa_bit_operators.which_token_is() != "NONE" && last_detected_token == "NONE") ? 
-                    dfa_bit_operators.which_token_is() : last_detected_token;   
-    last_detected_token = (dfa_math_symbols.which_token_is() != "NONE" && last_detected_token == "NONE") ? 
+    last_detected_token = (dfa_bit_operators.which_token_is() != "NONE") ? 
+                    dfa_bit_operators.which_token_is() : last_detected_token;  
+    last_detected_token = (dfa_relational_operators.which_token_is() != "NONE") ? 
+                    dfa_relational_operators.which_token_is() : last_detected_token; 
+    last_detected_token = (dfa_math_symbols.which_token_is() != "NONE") ? 
                     dfa_math_symbols.which_token_is() : last_detected_token;       
-    last_detected_token = (dfa_special_symbols.which_token_is() != "NONE" && last_detected_token == "NONE") ? 
+    last_detected_token = (dfa_special_symbols.which_token_is() != "NONE") ? 
                     dfa_special_symbols.which_token_is() : last_detected_token;      
+    last_detected_token = (dfa_char_literals.which_token_is() != "NONE") ? 
+                    dfa_char_literals.which_token_is() : last_detected_token;  
+    last_detected_token = (dfa_logic_operators.which_token_is() != "NONE") ?
+                    dfa_logic_operators.which_token_is() : last_detected_token;  
 }
 
 void mini_c_lexer::Scanner::make_dfas_do_transition(char current_character) {
@@ -218,6 +235,7 @@ void mini_c_lexer::Scanner::make_dfas_do_transition(char current_character) {
     dfa_grouping_operators.do_transition(current_character);
     dfa_string_literals.do_transition(current_character);
     dfa_special_symbols.do_transition(current_character);
+    dfa_char_literals.do_transition(current_character);
 };
 
 void mini_c_lexer::Scanner::restart_dfas() {
@@ -231,13 +249,14 @@ void mini_c_lexer::Scanner::restart_dfas() {
     dfa_grouping_operators.restart();
     dfa_string_literals.restart();
     dfa_special_symbols.restart();
+    dfa_char_literals.restart();
 };
 
 bool mini_c_lexer::Scanner::is_current_prefix_a_lexem() {
     if (dfa_bit_operators.is_lexem() || dfa_grouping_operators.is_lexem() || dfa_identifiers.is_lexem() ||
         dfa_integers.is_lexem() || dfa_logic_operators.is_lexem() || dfa_math_symbols.is_lexem() ||
         dfa_point_numbers.is_lexem() || dfa_relational_operators.is_lexem() || dfa_string_literals.is_lexem() ||
-        dfa_special_symbols.is_lexem() ||
+        dfa_special_symbols.is_lexem() || dfa_char_literals.is_lexem() ||
         prefix == "auto" || prefix == "double" || prefix == "int" ||
         prefix == "struct" || prefix == "break" || prefix == "else" ||
         prefix == "long" || prefix == "switch" || prefix == "case" ||
@@ -277,3 +296,15 @@ void mini_c_lexer::Scanner::remove_comments(std::string& input) {
         }
     }
 };
+
+bool mini_c_lexer::Scanner::is_scanning_string_or_char_literal() {
+    return dfa_char_literals.is_scanning_char_literal() || dfa_string_literals.is_scanning_string_literal();
+}
+
+bool mini_c_lexer::Scanner::is_a_longer_prefix_possible() {
+    // The prefix can be a point number
+    bool is_possible = (dfa_point_numbers.get_current_state() == 2 ||
+                        dfa_point_numbers.get_current_state() == 3 ||
+                        dfa_point_numbers.get_current_state() == 4);
+    return is_possible;
+}

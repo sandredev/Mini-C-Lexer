@@ -66,3 +66,7 @@ std::string mini_c_lexer::DFAStringLiterals::which_token_is() {
     if (is_lexem()) return "STRING_LITERAL";
     return "NONE";
 }
+
+bool mini_c_lexer::DFAStringLiterals::is_scanning_string_literal() {
+    return current_state == 1;
+}

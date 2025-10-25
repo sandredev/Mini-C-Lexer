@@ -4,13 +4,13 @@
 #include <string>
 
 namespace mini_c_lexer {
-    class DFAStringLiterals : public DFA {
+    class DFACharLiterals : public DFA {
         public:
-            DFAStringLiterals();         
+            DFACharLiterals();         
             void do_transition(char& input) override;
             bool is_lexem() const override;
             void test() override;
             std::string which_token_is() override;
-            bool is_scanning_string_literal();
+            bool is_scanning_char_literal();
     };
 };

@@ -7,29 +7,31 @@
 mini_c_lexer::DFASpecialSymbols::DFASpecialSymbols() {
     /*
     DFA:
-                    =            ,            ;            -            >           .           #      
-    init            ASSIGN       COMMA        SEMI         MINUS        -           DOT         HASHTAG     0   
-    ASSIGN          -            -            -            -            -           -           -           1
-    COMMA           -            -            -            -            -           -           -           1
-    SEMI            -            -            -            -            -           -           -           1        
-    MINUS           -            -            -            -            ARROW_OP    -           -           0
-    DOT_OP          -            -            -            -            -           -           -           1         
-    ARROW_OP        -            -            -            -            -           -           -           1
-    HASHTAG         -            -            -            -            -           -           -           1
+                    =            ,            ;            -            >           .           #           :
+    init            ASSIGN       COMMA        SEMI         MINUS        -           DOT         HASHTAG     COLON   0   
+    ASSIGN          -            -            -            -            -           -           -           -       1
+    COMMA           -            -            -            -            -           -           -           -       1
+    SEMI            -            -            -            -            -           -           -           -       1         
+    MINUS           -            -            -            -            ARROW_OP    -           -           -       0
+    DOT_OP          -            -            -            -            -           -           -           -       1            
+    ARROW_OP        -            -            -            -            -           -           -           -       1
+    HASHTAG         -            -            -            -            -           -           -           -       1
+    COLON           -            -            -            -            -           -           -           -       1   
 
     the last column specifies whether the state is acceptance or not.
 
     -1 means no transition.
     */
     transitions_table = {
-        {1, 2, 3, 4, -1, 5, 7, 0},  // init
-        {-1, -1, -1, -1, -1, -1, -1, 1},  // ASSIGN
-        {-1, -1, -1, -1, -1, -1, -1, 1},  // COMMA
-        {-1, -1, -1, -1, -1, -1, -1, 1},  // SEMI
-        {-1, -1, -1, -1, 6, -1, -1, 0},  // MINUS
-        {-1, -1, -1, -1, -1, -1, -1, 1}, // DOT_OP
-        {-1, -1, -1, -1, -1, -1, -1, 1}, // ARROW_OP
-        {-1, -1, -1, -1, -1, -1, -1, 1}  // HASHTAG
+        {1, 2, 3, 4, -1, 5, 7, 8, 0},  // init
+        {-1, -1, -1, -1, -1, -1, -1, -1, 1},  // ASSIGN
+        {-1, -1, -1, -1, -1, -1, -1, -1, 1},  // COMMA
+        {-1, -1, -1, -1, -1, -1, -1, -1, 1},  // SEMI
+        {-1, -1, -1, -1, 6, -1, -1, -1, 0},  // MINUS
+        {-1, -1, -1, -1, -1, -1, -1, -1, 1}, // DOT_OP
+        {-1, -1, -1, -1, -1, -1, -1, -1, 1}, // ARROW_OP
+        {-1, -1, -1, -1, -1, -1, -1, -1, 1},  // HASHTAG
+        {-1, -1, -1, -1, -1, -1, -1, -1, 1}  //COLON
     };
 };
 
@@ -58,6 +60,9 @@ void mini_c_lexer::DFASpecialSymbols::do_transition(char& input) {
     case '#':
         current_state = transitions_table[current_state][6];
         break;
+    case ':':
+        current_state = transitions_table[current_state][7];
+        break;
     default:
         current_state = -1;
         break;
@@ -73,6 +78,8 @@ void mini_c_lexer::DFASpecialSymbols::test() {
         "#",
         "->",
         "=",
+        ":",
+        "::",
         "-",
         ";;"
     };
@@ -108,6 +115,9 @@ std::string mini_c_lexer::DFASpecialSymbols::which_token_is() {
     case 7:
         return "HASHTAG";
         break;
+    case 8: 
+        return "COLON";
+        break;
     default:
         return "NONE";
         break;
@@ -116,5 +126,5 @@ std::string mini_c_lexer::DFASpecialSymbols::which_token_is() {
 
 bool mini_c_lexer::DFASpecialSymbols::is_lexem() const {
     if (current_state == -1) return false;
-    return transitions_table[current_state][7] == 1;
+    return transitions_table[current_state][8] == 1;
 }

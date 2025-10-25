@@ -38,5 +38,8 @@ namespace mini_c_lexer {
 
             // Says which token the DFA has accepted (in case it accepts more than one)
             virtual std::string which_token_is() = 0;
+
+            // Returns the current state. Used for debugging
+            virtual int get_current_state();
     };
 }

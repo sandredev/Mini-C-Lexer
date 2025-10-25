@@ -8,8 +8,10 @@
 #include "include/deterministic_finite_automatas/dfa_grouping_operators.hpp"
 #include "include/deterministic_finite_automatas/dfa_string_literals.hpp"
 #include "include/deterministic_finite_automatas/dfa_special_symbols.hpp"
+#include "include/deterministic_finite_automatas/dfa_char_literals.hpp"
 #include "include/scanner.hpp"
 #include <iostream>
+#include <fstream>
 
 void test_dfas() {
     mini_c_lexer::DFAIdentifiers dfa_identifiers;
@@ -42,21 +44,21 @@ void test_dfas() {
     mini_c_lexer::DFASpecialSymbols dfa_special_symbols;
     dfa_special_symbols.test();
     std::cout << std::endl;
+    mini_c_lexer::DFACharLiterals dfa_char_literals;
+    dfa_char_literals.test();
+    std::cout << std::endl;
 }
 
 int main() {
     test_dfas();
     mini_c_lexer::Scanner scanner;
-    std::string code = "int variable = 1;";
-    scanner.scan(code);
-    code = "int main() {\n"
-    "    int index;\n"
-    "// comment1 \n"
-    "    int array[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 9};\n"
-    "    array[9] = array[9] + 1; // comment 2\n"
-    "    return 0;\n"
-    "}// comment 3\n";
+    std::string code = "";
     std::cout << std::endl;
-    scanner.scan(code);  
+    std::fstream code_file("test_code.c");
+    std::string code_line;
+    while (std::getline(code_file, code_line)) {
+        code += code_line + "\n";
+    }
+    scanner.scan(code);
     return 0;
 }

@@ -11,6 +11,7 @@
 #include "deterministic_finite_automatas/dfa_grouping_operators.hpp"
 #include "deterministic_finite_automatas/dfa_string_literals.hpp"
 #include "deterministic_finite_automatas/dfa_special_symbols.hpp"
+#include "deterministic_finite_automatas/dfa_char_literals.hpp"
 
 namespace mini_c_lexer {
     // Class that scans a C code and outputs each token that finds
@@ -28,6 +29,7 @@ namespace mini_c_lexer {
             DFAGroupingOperators dfa_grouping_operators;
             DFAStringLiterals dfa_string_literals;
             DFASpecialSymbols dfa_special_symbols;
+            DFACharLiterals dfa_char_literals;
         public:
             Scanner();
 
@@ -63,8 +65,16 @@ namespace mini_c_lexer {
 
             // Checks if the current prefix buffered corresponds to at least 1 pattern 
             // (1 posible token)
-            bool is_current_prefix_a_lexem();
+            bool is_current_prefix_a_lexem();  
 
+            // Remove comments from the code before scanning it
             void remove_comments(std::string& input);
+
+            // Checks if a string literal or char literal is being scanned
+            bool is_scanning_string_or_char_literal();
+
+            // Checks if a current prefix is not a lexem but it can be converted into a lexem
+            // with more characters (like "12.34e" can be converted into a lexem if it's concatenated with "+2")
+            bool is_a_longer_prefix_possible();
     };
 };
